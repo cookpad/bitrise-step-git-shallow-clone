@@ -1,0 +1,149 @@
+#
+# A couple of useful guides & docs:
+#
+# - Main Bitrise CLI docs: https://github.com/bitrise-io/bitrise/tree/master/_docs
+# - Step Development Guideline: https://github.com/bitrise-io/bitrise/blob/master/_docs/step-development-guideline.md
+# - Bitrise.yml format spec: https://github.com/bitrise-io/bitrise/blob/master/_docs/bitrise-yml-format-spec.md
+# - Bitrise docs: http://devcenter.bitrise.io/
+# - Bitrise CLI guides: http://devcenter.bitrise.io/bitrise-cli/
+
+title: |-
+  Git Shallow Clone
+summary: |
+  Fetch only required commits
+description: |
+  Only fetch 1 or 2 commits, even for pull requests.
+website: https://github.com/cookpad/bitrise-step-git-shallow-clone
+source_code_url: https://github.com/cookpad/bitrise-step-git-shallow-clone
+support_url: https://github.com/cookpad/bitrise-step-git-shallow-clone/issues
+host_os_tags:
+  - osx-10.10
+  - ubuntu-16.04
+
+# If this step should be available only for certain project types
+# just uncomment this `project_type_tags` section and include all the
+# project types supported by the step. If the step can be used for all
+# project types then you can just remove this section.
+# If no `project_type_tags` specified (or specified as an empty array)
+# that means the step can be used for any project type.
+# You can find more information about project type tags in the Step Development Guideline:
+# https://github.com/bitrise-io/bitrise/blob/master/_docs/step-development-guideline.md
+#
+# project_type_tags:
+#   - ios
+#   - macos
+#   - android
+#   - xamarin
+#   - react-native
+#   - cordova
+#   - ionic
+
+# Type tags are used for categorizing steps, for easier step discovery in Step Libraries.
+# You can find more information about type tags in the Step Development Guideline:
+# https://github.com/bitrise-io/bitrise/blob/master/_docs/step-development-guideline.md
+type_tags:
+  - utility
+
+is_requires_admin_user: false
+is_always_run: false
+is_skippable: false
+run_if: .IsCI
+
+deps:
+  brew:
+  - name: git
+  - name: git-lfs
+  apt_get:
+  - name: git
+  - name: git-lfs
+
+
+toolkit:
+  bash:
+    entry_file: step.sh
+
+# Most inputs and outputs come from the official Bitrise Git Clone step.
+inputs:
+- repository_url: $GIT_REPOSITORY_URL
+  opts:
+    title: Git repository URL
+    is_required: true
+    is_dont_change_value: true
+- clone_into_dir: $BITRISE_SOURCE_DIR
+  opts:
+    title: Clone destination (local) directory path
+    is_required: true
+- commit: $BITRISE_GIT_COMMIT
+  opts:
+    category: Clone arguments
+    title: Git Commit to clone
+    is_dont_change_value: true
+- tag: $BITRISE_GIT_TAG
+  opts:
+    category: Clone arguments
+    title: Git Tag to clone
+    is_dont_change_value: true
+- branch: $BITRISE_GIT_BRANCH
+  opts:
+    category: Clone arguments
+    title: Git branch to clone
+    is_dont_change_value: true
+- branch_dest: $BITRISEIO_GIT_BRANCH_DEST
+  opts:
+    category: Clone arguments
+    title: Destination git branch, used for pull requests
+    is_dont_change_value: true
+- pull_request_id: $PULL_REQUEST_ID
+  opts:
+    category: Clone arguments
+    title: Pull request ID on GitHub
+    is_dont_change_value: true
+- pull_request_merge_branch: $BITRISEIO_PULL_REQUEST_MERGE_BRANCH
+  opts:
+    category: Clone arguments
+    title: Merged pull request branch
+    is_dont_change_value: true
+- pull_request_head_branch: $BITRISEIO_PULL_REQUEST_HEAD_BRANCH
+  opts:
+    category: Clone arguments
+    title: Pull request head branch
+    description: |-
+      If the Git hosting provider system supports and provides this,
+      this special git ref should point to the source of the pull request.
+    is_dont_change_value: true
+- update_submodules: "yes"
+  opts:
+    category: Checkout options
+    title: Update the registered submodules?
+    description: |-
+      Update the registered submodules to match what the superproject expects by cloning missing submodules, fetching missing commits in submodules and updating the working tree of the submodules.
+      If set to "no" `git fetch` calls will get the `--no-recurse-submodules` flag.
+    value_options:
+    - "yes"
+    - "no"
+outputs:
+- GIT_CLONE_COMMIT_HASH:
+  opts:
+    title: Cloned git commit's commit hash
+- GIT_CLONE_COMMIT_MESSAGE_SUBJECT:
+  opts:
+    title: Cloned git commit's message subject
+- GIT_CLONE_COMMIT_MESSAGE_BODY:
+  opts:
+    title: Cloned git commit's message body
+- GIT_CLONE_COMMIT_COUNT:
+  opts:
+    title: Cloned git commit counts
+    description: Always 1
+- GIT_CLONE_COMMIT_AUTHOR_NAME:
+  opts:
+    title: Cloned git commit's author name
+- GIT_CLONE_COMMIT_AUTHOR_EMAIL:
+  opts:
+    title: Cloned git commit's author email address
+- GIT_CLONE_COMMIT_COMMITER_NAME:
+  opts:
+    title: Cloned git commit's committer name
+- GIT_CLONE_COMMIT_COMMITER_EMAIL:
+  opts:
+    title: Cloned git commit's committer email
